@@ -1,24 +1,18 @@
 "use client"
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
+import React from "react"
+import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card"
+import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts"
 import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
 
-interface DemandData {
-  month: string
-  demand: number
+interface DemandPrediction {
+  wineId: number
+  predictedDemand: number
 }
 
-  /**
-   * Displays a line chart of demand prediction data for the next 12 months.
-   *
-   * The data is fetched from the "/api/demand-prediction" endpoint.
-   *
-   * @returns A JSX element representing the demand prediction chart.
-   */
 export default function DemandPrediction() {
-  const [data, setData] = useState<DemandData[]>([])
+  const [data, setData] = useState<DemandPrediction[]>([])
 
   useEffect(() => {
     async function fetchDemandPrediction() {
@@ -42,12 +36,12 @@ export default function DemandPrediction() {
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={data}>
-              <XAxis dataKey="month" />
+            <BarChart data={data}>
+              <XAxis dataKey="wineId" />
               <YAxis />
               <Tooltip />
-              <Line type="monotone" dataKey="demand" stroke="#8884d8" strokeWidth={2} />
-            </LineChart>
+              <Bar dataKey="predictedDemand" fill="#8884d8" />
+            </BarChart>
           </ResponsiveContainer>
         </CardContent>
       </Card>

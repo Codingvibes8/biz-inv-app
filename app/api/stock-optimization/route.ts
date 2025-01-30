@@ -1,14 +1,41 @@
 import { NextResponse } from "next/server"
+import { supabase } from "../../../lib/supabase"
 
 export async function GET() {
-  // In a real application, this data would come from an optimization algorithm
-  const stockOptimization = [
-    { id: 1, product: "Product A", currentStock: 50, recommendedStock: 75, action: "Increase" },
-    { id: 2, product: "Product B", currentStock: 100, recommendedStock: 80, action: "Decrease" },
-    { id: 3, product: "Product C", currentStock: 25, recommendedStock: 60, action: "Increase" },
-    { id: 4, product: "Product D", currentStock: 75, recommendedStock: 70, action: "Maintain" },
-    { id: 5, product: "Product E", currentStock: 40, recommendedStock: 55, action: "Increase" },
-  ]
+  const { data: wines, error: winesError } = await supabase.from("wines").select("*")
+
+  if (winesError) {
+    return NextResponse.json({ error: "Error fetching wines" }, { status: 500 })
+  }
+
+  const { data: demandPredictions, error: demandError } = await supabase.from("demand_predictions").select("*")
+
+  if (demandError) {
+    return NextResponse.json({ error: "Error fetching demand predictions" }, { status: 500 })
+  }
+
+  const stockOptimization = wines.map((wine) => {
+    const prediction = demandPredictions.find((p) => p.wine_id === wine.id)
+    const predictedDemand = prediction ? prediction.predicted_demand : 0
+    const optimalStock = Math.round(predictedDemand * 1.2) // 20% buffer
+
+    let action
+    if (wine.stock < optimalStock * 0.8) {
+      action = "Increase"
+    } else if (wine.stock > optimalStock * 1.2) {
+      action = "Decrease"
+    } else {
+      action = "Maintain"
+    }
+
+    return {
+      id: wine.id,
+      product: wine.name,
+      currentStock: wine.stock,
+      recommendedStock: optimalStock,
+      action,
+    }
+  })
 
   return NextResponse.json(stockOptimization)
 }

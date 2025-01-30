@@ -1,26 +1,38 @@
 import { NextResponse } from "next/server"
+import { supabase } from "../../../lib/supabase"
 
-/**
- * Handles GET requests to retrieve a summary of the products in the database.
- *
- * Returns a JSON response containing the following properties:
- *
- * - `totalProducts`: the total number of products
- * - `lowStockItems`: the number of products with low stock
- * - `overstockItems`: the number of products with overstock
- * - `totalValue`: the total value of all products
- *
- * @returns {NextResponse} A JSON response with the dashboard data.
- */
+  /**
+   * Fetches the dashboard data.
+   * @returns A JSON response with the following properties:
+   * - totalProducts: The total number of products.
+   * - lowStockItems: The number of products with low stock.
+   * - overstockItems: The number of products with overstock.
+   * - totalValue: The total value of all products.
+   */
+
+  
 export async function GET() {
-  // In a real application, this data would come from a database
+  const { data: wines, error: winesError } = await supabase.from("wines").select("*")
+
+  if (winesError) {
+    return NextResponse.json({ error: "Error fetching wines" }, { status: 500 })
+  }
+
+  const totalProducts = wines.length
+  const totalValue = wines.reduce((sum, wine) => sum + wine.price * wine.stock, 0)
+  const lowStockItems = wines.filter((wine) => wine.stock < 20).length
+  const overstockItems = wines.filter((wine) => wine.stock > 100).length
+
   const dashboardData = {
-    totalProducts: 120,
-    lowStockItems: 18,
-    overstockItems: 7,
-    totalValue: 62000,
+    totalProducts,
+    lowStockItems,
+    overstockItems,
+    totalValue,
   }
 
   return NextResponse.json(dashboardData)
 }
+
+
+
 

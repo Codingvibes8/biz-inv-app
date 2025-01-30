@@ -1,33 +1,30 @@
 "use client"
-
-/**
- * A component that displays a list of products with their stock and optimal levels.
- *
- * @returns A JSX element representing the product list.
- */
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import React from "react"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../components/ui/table"
+import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card"
 import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
 
-interface Product {
+interface Wine {
   id: number
   name: string
+  type: string
+  region: string
+  price: number
   stock: number
-  optimal: number
 }
 
 export default function ProductList() {
-  const [products, setProducts] = useState<Product[]>([])
+  const [wines, setWines] = useState<Wine[]>([])
 
   useEffect(() => {
-    async function fetchProducts() {
+    async function fetchWines() {
       const response = await fetch("/api/products")
-      const productData = await response.json()
-      setProducts(productData)
+      const wineData = await response.json()
+      setWines(wineData)
     }
 
-    fetchProducts()
+    fetchWines()
   }, [])
 
   return (
@@ -38,23 +35,27 @@ export default function ProductList() {
     >
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl font-bold">Product Inventory</CardTitle>
+          <CardTitle className="text-2xl font-bold">Wine Inventory</CardTitle>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead className="font-semibold">Name</TableHead>
-                <TableHead className="font-semibold">Current Stock</TableHead>
-                <TableHead className="font-semibold">Optimal Stock</TableHead>
+                <TableHead className="font-semibold">Type</TableHead>
+                <TableHead className="font-semibold">Region</TableHead>
+                <TableHead className="font-semibold">Price</TableHead>
+                <TableHead className="font-semibold">Stock</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {products.map((product) => (
-                <TableRow key={product.id}>
-                  <TableCell className="font-medium">{product.name}</TableCell>
-                  <TableCell>{product.stock}</TableCell>
-                  <TableCell>{product.optimal}</TableCell>
+              {wines.map((wine) => (
+                <TableRow key={wine.id}>
+                  <TableCell className="font-medium">{wine.name}</TableCell>
+                  <TableCell>{wine.type}</TableCell>
+                  <TableCell>{wine.region}</TableCell>
+                  <TableCell>${wine.price.toLocaleString()}</TableCell>
+                  <TableCell>{wine.stock}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

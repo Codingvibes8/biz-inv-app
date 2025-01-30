@@ -1,5 +1,5 @@
-import DemandPrediction from "@/components/DemandPrediction"
-import StockOptimization from "@/components/StockOptimization"
+import DemandPrediction from "../../components/DemandPrediction"
+import StockOptimization from "../../components/StockOptimization"
 
 /**
  * The analytics page component.
